@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { SITE } from '../lib/site';
+---
+<BaseLayout title="About" description={`About ${SITE.name} — ${SITE.description}`}>
+  <header class="page-intro">
+    <h1>About</h1>
+  </header>
+
+  <img class="about-mark" src="/images/logo-mark.png" alt={`${SITE.name} mark`} width="56" height="69" loading="lazy" />
+
+  <section class="prose">
+    <p>I'm Sanskar.</p>
+    <p>{SITE.name} is my digital home for the things I create, notice, learn, and think about — {SITE.tagline.toLowerCase()}.</p>
+  </section>
+
+  <section class="section prose">
+    <h2>Elsewhere</h2>
+    <SocialLinks />
+    <p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+  </section>
+</BaseLayout>

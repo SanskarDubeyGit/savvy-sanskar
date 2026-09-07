@@ -1,0 +1,13 @@
+---
+import { SITE } from '../lib/site';
+const links = [
+  ['GitHub', SITE.social.github],
+  ['LinkedIn', SITE.social.linkedin],
+  ['X', SITE.social.x],
+].filter(([, href]) => href);
+---
+{links.length > 0 && (
+  <div class="footer-links" aria-label="Social links">
+    {links.map(([label, href]) => <a href={href} target="_blank" rel="noreferrer">{label}</a>)}
+  </div>
+)}

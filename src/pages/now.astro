@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
+---
+<BaseLayout title="Now" description={`What I'm currently working on — ${SITE.name}`}>
+  <header class="page-intro">
+    <h1>Now</h1>
+    <p>What I'm currently working on and interested in.</p>
+  </header>
+  <section class="section prose">
+    <h2>Working on</h2>
+    <p>{SITE.now}</p>
+  </section>
+  <section class="section prose">
+    <h2>Interested in</h2>
+    <p>Writing, design, technology, and learning things deeply enough to explain them clearly.</p>
+  </section>
+  <section class="section">
+    <div class="date">Last updated September 7, 2026</div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,30 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  basePath: string;
+}
+const { currentPage, totalPages, basePath } = Astro.props as Props;
+const pageUrl = (n: number) => (n === 1 ? basePath : `${basePath}/page/${n}`);
+---
+{totalPages > 1 && (
+  <nav class="pagination" aria-label="Pagination">
+    {currentPage > 1 ? (
+      <a href={pageUrl(currentPage - 1)} aria-label="Previous page">←</a>
+    ) : (
+      <span class="disabled" aria-hidden="true">←</span>
+    )}
+    {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) =>
+      n === currentPage ? (
+        <span class="current" aria-current="page">{n}</span>
+      ) : (
+        <a href={pageUrl(n)} aria-label={`Go to page ${n}`}>{n}</a>
+      ),
+    )}
+    {currentPage < totalPages ? (
+      <a href={pageUrl(currentPage + 1)} aria-label="Next page">→</a>
+    ) : (
+      <span class="disabled" aria-hidden="true">→</span>
+    )}
+  </nav>
+)}

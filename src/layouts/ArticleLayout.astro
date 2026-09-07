@@ -1,0 +1,51 @@
+---
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import { SITE, formatDate } from '../lib/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  publishedAt: Date;
+  updatedAt?: Date;
+  coverImage?: ImageMetadata;
+  coverImageAlt?: string;
+}
+
+const { title, description, publishedAt, updatedAt, coverImage, coverImageAlt } = Astro.props;
+
+// If this article has a cover image, use it as the social-share image too.
+// Otherwise BaseLayout falls back to the site-wide default automatically.
+const ogImage = coverImage
+  ? (await getImage({ src: coverImage, width: 1200 })).src
+  : undefined;
+---
+<BaseLayout
+  title={title}
+  description={description ?? SITE.description}
+  image={ogImage}
+  type="article"
+  publishedAt={publishedAt}
+  updatedAt={updatedAt}
+>
+  <article class="article">
+    <header class="article-header">
+      <h1 class="article-title">{title}</h1>
+      <p class="date">
+        {formatDate(publishedAt)}
+        {updatedAt && <span class="updated">· Updated {formatDate(updatedAt)}</span>}
+      </p>
+    </header>
+    {coverImage && (
+      <Image
+        class="article-cover"
+        src={coverImage}
+        alt={coverImageAlt ?? ''}
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 800px) 800px, 100vw"
+      />
+    )}
+    <div class="article-body"><slot /></div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Pagination from '../../components/Pagination.astro';
+import { SITE, formatDate } from '../../lib/site';
+
+const all = (await getCollection('articles')).sort(
+  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+);
+const perPage = 5;
+const pageItems = all.slice(0, perPage);
+const totalPages = Math.max(1, Math.ceil(all.length / perPage));
+---
+<BaseLayout title="Articles" description={`Long-form writing from ${SITE.name}.`}>
+  <header class="page-intro">
+    <h1>Articles</h1>
+    <p>Longer, more considered pieces.</p>
+  </header>
+  <div class="sort-row">
+    <button type="button" id="sort-toggle" aria-pressed="false">Newest first</button>
+  </div>
+  <section class="entry-list" id="articles-list" aria-label="Articles">
+    {pageItems.map((entry) => (
+      <article class="article-item" data-date={entry.data.publishedAt.toISOString()}>
+        <a href={`/articles/${entry.id}`}>
+          <h2>{entry.data.title}</h2>
+        </a>
+        <div class="date">{formatDate(entry.data.publishedAt)}</div>
+      </article>
+    ))}
+  </section>
+  <Pagination currentPage={1} totalPages={totalPages} basePath="/articles" />
+  <script is:inline>
+    const toggle = document.querySelector('#sort-toggle');
+    const list = document.querySelector('#articles-list');
+    toggle?.addEventListener('click', () => {
+      const oldest = toggle.getAttribute('aria-pressed') === 'true';
+      const items = [...list.querySelectorAll('[data-date]')].sort((a, b) => {
+        const diff = new Date(a.dataset.date) - new Date(b.dataset.date);
+        return oldest ? -diff : diff;
+      });
+      items.forEach((item) => list.appendChild(item));
+      toggle.setAttribute('aria-pressed', String(!oldest));
+      toggle.textContent = oldest ? 'Newest first' : 'Oldest first';
+    });
+  </script>
+</BaseLayout>

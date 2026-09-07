@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Pagination from '../../../components/Pagination.astro';
+import { formatDate } from '../../../lib/site';
+
+// See the note in src/pages/thoughts/page/[page].astro — everything this
+// function needs has to be fetched/computed inside it, not above it.
+export async function getStaticPaths() {
+  const perPage = 5;
+  const all = (await getCollection('articles')).sort(
+    (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+  );
+  const totalPages = Math.max(1, Math.ceil(all.length / perPage));
+
+  return Array.from({ length: totalPages - 1 }, (_, i) => {
+    const page = i + 2;
+    const pageItems = all.slice((page - 1) * perPage, page * perPage);
+    return { params: { page: String(page) }, props: { page, pageItems, totalPages } };
+  });
+}
+
+const { page, pageItems, totalPages } = Astro.props;
+---
+<BaseLayout title={`Articles — Page ${page}`}>
+  <header class="page-intro">
+    <h1>Articles</h1>
+    <p>Longer, more considered pieces.</p>
+  </header>
+  <div class="sort-row">
+    <button type="button" id="sort-toggle" aria-pressed="false">Newest first</button>
+  </div>
+  <section class="entry-list" id="articles-list" aria-label={`Articles, page ${page}`}>
+    {pageItems.map((entry) => (
+      <article class="article-item" data-date={entry.data.publishedAt.toISOString()}>
+        <a href={`/articles/${entry.id}`}>
+          <h2>{entry.data.title}</h2>
+        </a>
+        <div class="date">{formatDate(entry.data.publishedAt)}</div>
+      </article>
+    ))}
+  </section>
+  <Pagination currentPage={page} totalPages={totalPages} basePath="/articles" />
+  <script is:inline>
+    const toggle = document.querySelector('#sort-toggle');
+    const list = document.querySelector('#articles-list');
+    toggle?.addEventListener('click', () => {
+      const oldest = toggle.getAttribute('aria-pressed') === 'true';
+      const items = [...list.querySelectorAll('[data-date]')].sort((a, b) => {
+        const diff = new Date(a.dataset.date) - new Date(b.dataset.date);
+        return oldest ? -diff : diff;
+      });
+      items.forEach((item) => list.appendChild(item));
+      toggle.setAttribute('aria-pressed', String(!oldest));
+      toggle.textContent = oldest ? 'Newest first' : 'Oldest first';
+    });
+  </script>
+</BaseLayout>

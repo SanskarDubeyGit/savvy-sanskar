@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
+---
+<BaseLayout>
+  <section class="home">
+    <p class="eyebrow">{SITE.tagline}</p>
+    <h1>{SITE.name}</h1>
+    <p class="lede">{SITE.description}</p>
+
+    <nav class="home-links" aria-label="Explore">
+      <a href="/thoughts">Thoughts <span aria-hidden="true">→</span></a>
+      <a href="/articles">Articles <span aria-hidden="true">→</span></a>
+      <a href="/now">Now <span aria-hidden="true">→</span></a>
+      <a href="/about">About <span aria-hidden="true">→</span></a>
+    </nav>
+
+    <a class="now-teaser" href="/now">
+      <span class="now-dot" aria-hidden="true"></span>
+      Currently: {SITE.now}
+    </a>
+  </section>
+</BaseLayout>

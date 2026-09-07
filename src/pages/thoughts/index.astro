@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Pagination from '../../components/Pagination.astro';
+import ThoughtItem from '../../components/ThoughtItem.astro';
+import { SITE } from '../../lib/site';
+
+const all = (await getCollection('thoughts')).sort(
+  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+);
+const perPage = 10;
+const totalPages = Math.max(1, Math.ceil(all.length / perPage));
+const pageItems = all.slice(0, perPage);
+---
+<BaseLayout title="Thoughts" description={`Short, unfiltered notes from ${SITE.name}.`}>
+  <header class="page-intro">
+    <h1>Thoughts</h1>
+    <p>Short, informal notes — ideas, observations, and things I'm chewing on.</p>
+  </header>
+  <section class="entry-list" aria-label="Thoughts">
+    {pageItems.map((entry) => <ThoughtItem entry={entry} />)}
+  </section>
+  <Pagination currentPage={1} totalPages={totalPages} basePath="/thoughts" />
+</BaseLayout>

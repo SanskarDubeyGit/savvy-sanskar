@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Pagination from '../../../components/Pagination.astro';
+import ThoughtItem from '../../../components/ThoughtItem.astro';
+
+// Astro calls getStaticPaths() in its own isolated scope during the build,
+// separately from the rest of this file. That means it can only see its
+// own imports and whatever is declared *inside* it — nothing declared as a
+// top-level const in this frontmatter block is visible to it. So all the
+// data-fetching lives inside the function itself.
+export async function getStaticPaths() {
+  const perPage = 10;
+  const all = (await getCollection('thoughts')).sort(
+    (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+  );
+  const totalPages = Math.max(1, Math.ceil(all.length / perPage));
+
+  return Array.from({ length: totalPages - 1 }, (_, i) => {
+    const page = i + 2;
+    const pageItems = all.slice((page - 1) * perPage, page * perPage);
+    return { params: { page: String(page) }, props: { page, pageItems, totalPages } };
+  });
+}
+
+const { page, pageItems, totalPages } = Astro.props;
+---
+<BaseLayout title={`Thoughts — Page ${page}`}>
+  <header class="page-intro">
+    <h1>Thoughts</h1>
+    <p>Short, informal notes — ideas, observations, and things I'm chewing on.</p>
+  </header>
+  <section class="entry-list" aria-label={`Thoughts, page ${page}`}>
+    {pageItems.map((entry) => <ThoughtItem entry={entry} />)}
+  </section>
+  <Pagination currentPage={page} totalPages={totalPages} basePath="/thoughts" />
+</BaseLayout>
